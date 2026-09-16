@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#3358ff" />
+  <meta name="description" content="Persönliches EPD-Lernheft für Schreiben, Lesen und Hören." />
+  <title>EPD Heft</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect rx=%2222%22 width=%22100%22 height=%22100%22 fill=%22%233358ff%22/><path d=%22M27 21h46v58H27z%22 fill=%22white%22/><path d=%22M37 34h27M37 46h27M37 58h27%22 stroke=%22%233358ff%22 stroke-width=%225%22 stroke-linecap=%22round%22/></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navigation">
+      <div class="brand">
+        <div class="brand-mark">E</div>
+        <div>
+          <strong>EPD Heft</strong>
+          <span>Deutsch · VWU</span>
+        </div>
+      </div>
+
+      <nav class="nav" id="nav">
+        <button class="nav-item active" data-view="schreiben"><span>✍️</span>Schreiben</button>
+        <button class="nav-item" data-view="lesen"><span>📖</span>Lesen</button>
+        <button class="nav-item" data-view="hoeren"><span>🎧</span>Hören</button>
+        <button class="nav-item" data-view="fehler"><span>🧩</span>Fehlerjournal</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button class="ghost wide" id="exportBtn">Daten exportieren</button>
+        <label class="ghost wide file-label">Daten importieren<input id="importInput" type="file" accept="application/json" hidden /></label>
+        <p>Alles wird nur in diesem Browser gespeichert.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow" id="sectionEyebrow">EPD · SCHREIBEN</span>
+          <h1 id="sectionTitle">Schreiben</h1>
+        </div>
+        <div class="top-actions">
+          <span class="save-state" id="saveState">Gespeichert</span>
+          <button class="secondary" id="historyBtn">Verlauf</button>
+          <button class="primary" id="newEntryBtn">+ Neue Seite</button>
+        </div>
+      </header>
+
+      <section class="workspace" id="workspace"></section>
+    </main>
+  </div>
+
+  <dialog id="historyDialog" class="dialog">
+    <div class="dialog-head">
+      <div>
+        <span class="eyebrow">VERLAUF</span>
+        <h2>Gespeicherte Seiten</h2>
+      </div>
+      <button class="icon-btn" id="closeHistory" aria-label="Schließen">×</button>
+    </div>
+    <div id="historyList" class="history-list"></div>
+  </dialog>
+
+  <dialog id="confirmDialog" class="dialog small-dialog">
+    <h2>Seite löschen?</h2>
+    <p>Diese Seite wird dauerhaft aus deinem lokalen Heft entfernt.</p>
+    <div class="dialog-actions">
+      <button class="secondary" id="cancelDelete">Abbrechen</button>
+      <button class="danger" id="confirmDelete">Löschen</button>
+    </div>
+  </dialog>
+
+  <template id="editorTemplate">
+    <div class="layout-grid">
+      <section class="paper-card">
+        <div class="entry-meta">
+          <input class="title-input" id="entryTitle" placeholder="Titel der Aufgabe" maxlength="120" />
+          <input class="date-input" id="entryDate" type="date" />
+        </div>
+        <div id="editorArea"></div>
+      </section>
+
+      <aside class="tools-column">
+        <section class="tool-card timer-card">
+          <span class="tool-label">PRÜFUNGSZEIT</span>
+          <div class="timer" id="timerDisplay">80:00</div>
+          <div class="timer-actions">
+            <button class="primary compact" id="timerStart">Start</button>
+            <button class="secondary compact" id="timerPause">Pause</button>
+            <button class="ghost compact" id="timerReset">Reset</button>
+          </div>
+          <div class="preset-row" id="presetRow"></div>
+        </section>
+
+        <section class="tool-card" id="statsCard"></section>
+
+        <section class="tool-card tips-card" id="tipsCard"></section>
+      </aside>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
