@@ -1,0 +1,25 @@
+name: EPD14 desktop audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: JavaScript syntax
+        run: |
+          for file in *.js; do
+            node --check "$file"
+          done
+      - name: Desktop regression audit
+        run: node --test tests/epd14-static-audit.test.mjs
