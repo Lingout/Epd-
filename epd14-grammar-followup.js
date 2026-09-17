@@ -1,5 +1,8 @@
 (() => {
   const STYLE_ID = 'epd14-grammar-followup-style';
+  let pageLocked = false;
+  let previousHtmlOverflow = '';
+  let previousBodyOverflow = '';
 
   function injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
@@ -41,14 +44,39 @@
     if (customToolbar) customToolbar.classList.add('epd14-pdf-custom-toolbar');
   }
 
+  function setPageLock(shouldLock) {
+    const canLockDesktop = window.innerWidth > 1050;
+    const lock = shouldLock && canLockDesktop;
+
+    if (lock && !pageLocked) {
+      previousHtmlOverflow = document.documentElement.style.overflow;
+      previousBodyOverflow = document.body.style.overflow;
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      pageLocked = true;
+      return;
+    }
+
+    if (!lock && pageLocked) {
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.overflow = previousBodyOverflow;
+      pageLocked = false;
+    }
+  }
+
   function positionGrammarToolbar() {
     const toolbar = document.querySelector('.grammar-reader-top');
     const grid = document.getElementById('grammarReaderGrid');
     const workspace = document.getElementById('workspace');
     const topbar = document.querySelector('.topbar');
 
-    if (!toolbar || !grid || !workspace) return;
+    if (!toolbar || !grid || !workspace) {
+      setPageLock(false);
+      return;
+    }
 
+    setPageLock(true);
     toolbar.classList.add('epd14-fixed-grammar-toolbar');
     grid.classList.add('epd14-fixed-toolbar-offset');
 
@@ -85,5 +113,6 @@
 
   window.addEventListener('resize', scheduleFix, { passive: true });
   window.addEventListener('orientationchange', scheduleFix, { passive: true });
+  window.addEventListener('beforeunload', () => setPageLock(false));
   scheduleFix();
 })();
