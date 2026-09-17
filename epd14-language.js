@@ -25,6 +25,14 @@
     }
   }
 
+  function setText(element, value) {
+    if (element && element.textContent !== value) element.textContent = value;
+  }
+
+  function setHtml(element, value) {
+    if (element && element.innerHTML !== value) element.innerHTML = value;
+  }
+
   function activeLanguage() {
     return localStorage.getItem(LANG_PREF_KEY) === 'en' ? 'en' : 'de';
   }
@@ -209,7 +217,7 @@
     document.documentElement.lang = lang === 'en' ? 'en' : 'de';
 
     const brandSub = document.querySelector('.brand span');
-    if (brandSub) brandSub.textContent = lang === 'en' ? 'English · VWU' : 'Deutsch · VWU';
+    setText(brandSub, lang === 'en' ? 'English · VWU' : 'Deutsch · VWU');
 
     if (lang !== 'en') return;
 
@@ -224,13 +232,13 @@
     const labels = englishCoreLabels[view];
     const title = document.getElementById('sectionTitle');
     const eyebrow = document.getElementById('sectionEyebrow');
-    if (title) title.textContent = labels.title;
-    if (eyebrow) eyebrow.textContent = labels.eyebrow;
+    setText(title, labels.title);
+    setText(eyebrow, labels.eyebrow);
 
     const history = document.getElementById('historyBtn');
     const newEntry = document.getElementById('newEntryBtn');
-    if (history && history.style.display !== 'none') history.textContent = 'History';
-    if (newEntry && newEntry.style.display !== 'none') newEntry.textContent = '+ New page';
+    if (history && history.style.display !== 'none') setText(history, 'History');
+    if (newEntry && newEntry.style.display !== 'none') setText(newEntry, '+ New page');
 
     const titleInput = document.getElementById('entryTitle');
     if (titleInput) titleInput.placeholder = 'Task title';
@@ -274,7 +282,7 @@
     document.querySelectorAll('.term-input[data-side="de"]').forEach(input => {
       input.placeholder = foreign;
       const label = input.parentElement?.querySelector('span');
-      if (label) label.textContent = foreignCaps;
+      setText(label, foreignCaps);
     });
 
     const bulk = document.getElementById('bulkImportCard');
@@ -282,11 +290,11 @@
       const heading = bulk.querySelector('h3');
       const description = bulk.querySelector('p');
       const textarea = bulk.querySelector('textarea');
-      if (heading) heading.textContent = `${foreign} und Russisch mit Tabulator trennen`;
+      setText(heading, `${foreign} und Russisch mit Tabulator trennen`);
       if (description) {
-        description.innerHTML = lang === 'en'
+        setHtml(description, lang === 'en'
           ? 'Eine Karte pro Zeile: <b>study abroad</b> ⇥ <b>обучение за границей</b>'
-          : 'Eine Karte pro Zeile: <b>das Auslandssemester</b> ⇥ <b>семестр за рубежом</b>';
+          : 'Eine Karte pro Zeile: <b>das Auslandssemester</b> ⇥ <b>семестр за рубежом</b>');
       }
       if (textarea) {
         textarea.placeholder = lang === 'en'
@@ -358,9 +366,10 @@
     selectors.forEach(selector => {
       const element = root.querySelector?.(selector) || document.querySelector(selector);
       if (!element) return;
-      element.textContent = element.textContent
+      const next = element.textContent
         .replace(/Zaubianie/gi, 'Lernmodus')
         .replace(/ZAUBIANIE/g, 'LERNMODUS');
+      setText(element, next);
     });
   }
 
@@ -372,34 +381,34 @@
     const foreignCaps = lang === 'en' ? 'ENGLISH' : 'DEUTSCH';
 
     const flashFront = document.querySelector('.flash-front .flash-side-label');
-    if (flashFront) flashFront.textContent = foreignCaps;
+    setText(flashFront, foreignCaps);
 
     const modeButton = document.getElementById('openLearnMode');
-    if (modeButton) modeButton.textContent = 'Lernmodus · Заучивание';
+    setText(modeButton, 'Lernmodus · Заучивание');
 
     const learnEyebrow = document.querySelector('.learn-setup-card .eyebrow');
-    if (learnEyebrow) learnEyebrow.textContent = 'LERNMODUS · ЗАУЧИВАНИЕ';
+    setText(learnEyebrow, 'LERNMODUS · ЗАУЧИВАНИЕ');
     const start = document.getElementById('startLearn');
-    if (start) start.textContent = 'Lernmodus starten';
+    setText(start, 'Lernmodus starten');
 
     const deRu = document.querySelector('[data-direction="de-ru"]');
     const ruDe = document.querySelector('[data-direction="ru-de"]');
     if (deRu) {
       const labels = deRu.querySelectorAll('b');
-      if (labels[0]) labels[0].textContent = foreign;
+      setText(labels[0], foreign);
     }
     if (ruDe) {
       const labels = ruDe.querySelectorAll('b');
-      if (labels[1]) labels[1].textContent = foreign;
+      setText(labels[1], foreign);
     }
 
     const questionLabel = document.querySelector('.learn-question-label');
-    if (questionLabel && /DEUTSCH/i.test(questionLabel.textContent)) questionLabel.textContent = foreignCaps;
+    if (questionLabel && /DEUTSCH/i.test(questionLabel.textContent)) setText(questionLabel, foreignCaps);
     const questionHint = document.querySelector('.learn-question-card > p');
-    if (questionHint && lang === 'en') questionHint.textContent = questionHint.textContent.replace(/Deutsch/g, 'Englisch');
+    if (questionHint && lang === 'en') setText(questionHint, questionHint.textContent.replace(/Deutsch/g, 'Englisch'));
 
     const sectionTitle = document.getElementById('sectionTitle');
-    if (sectionTitle) sectionTitle.textContent = sectionTitle.textContent.replace(/Zaubianie/gi, 'Lernmodus');
+    if (sectionTitle) setText(sectionTitle, sectionTitle.textContent.replace(/Zaubianie/gi, 'Lernmodus'));
   }
 
   function patchAll() {
