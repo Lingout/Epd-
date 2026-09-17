@@ -81,7 +81,7 @@ test('backup covers German, English, Wortschatz, timers and grammar-note localSt
   assert.match(fixes, /epd-heft-/);
   assert.match(fixes, /epd14-/);
   assert.match(fixes, /epd14-backup-v2/);
-  assert.match(fixes, /Backward compatibility/);
+  assert.match(fixes, /parsed\.entries && parsed\.ui/);
 });
 
 test('EPD source has no MOST/Supabase/portal integration', () => {
