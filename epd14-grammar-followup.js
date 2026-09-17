@@ -234,11 +234,10 @@
     const workspaceStyle = getComputedStyle(workspace);
     const paddingLeft = parseFloat(workspaceStyle.paddingLeft) || 0;
     const paddingRight = parseFloat(workspaceStyle.paddingRight) || 0;
-    const topbarRect = topbar?.getBoundingClientRect();
-    const topbarBottom = topbarRect ? Math.max(0, topbarRect.bottom) : 116;
+    const topbarHeight = topbar?.getBoundingClientRect().height || 116;
     const gap = window.innerWidth <= 760 ? 8 : 12;
 
-    toolbar.style.top = `${Math.round(topbarBottom + gap)}px`;
+    toolbar.style.top = `${Math.round(topbarHeight + gap)}px`;
     toolbar.style.left = `${Math.round(workspaceRect.left + paddingLeft)}px`;
     toolbar.style.width = `${Math.max(280, Math.round(workspaceRect.width - paddingLeft - paddingRight))}px`;
 
@@ -265,6 +264,5 @@
 
   window.addEventListener('resize', scheduleFix, { passive: true });
   window.addEventListener('orientationchange', scheduleFix, { passive: true });
-  window.addEventListener('scroll', scheduleFix, { passive: true });
   scheduleFix();
 })();
