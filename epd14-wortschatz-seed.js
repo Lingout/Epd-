@@ -240,9 +240,9 @@
 
   const currentDecks = Array.isArray(data.decks) ? data.decks : [];
   const existingIds = new Set(currentDecks.map(deck => deck?.id).filter(Boolean));
-  const previousSeedVersion = data.wortschatzSeedVersion;
+  const hadExistingWortschatz = currentDecks.length > 0 || Boolean(data.wortschatzSeedVersion);
   const newDeckIds = new Set(['seed-deck-13', 'seed-deck-14', 'seed-deck-15', 'seed-deck-16']);
-  const decksToAdd = previousSeedVersion === 'wortschatz-2026-09-17-v2'
+  const decksToAdd = hadExistingWortschatz
     ? decks.filter(deck => newDeckIds.has(deck.id))
     : decks;
 
