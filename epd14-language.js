@@ -139,6 +139,9 @@
         font-size: 11px;
         line-height: 1.45;
       }
+      .deck-tile.epd14-lang-hidden {
+        display: none !important;
+      }
       .deck-lang-badge {
         display: inline-flex;
         align-items: center;
@@ -258,22 +261,77 @@
     });
   }
 
+  function patchCustomLanguageUI() {
+    const lang = activeLanguage();
+    const words = document.querySelector('[data-epd14-view="wortschatz"]');
+    const grammar = document.querySelector('[data-epd14-view="grammar"]');
+
+    setNavLabel(words, lang === 'en' ? 'Vocabulary' : 'Wortschatz');
+    setNavLabel(grammar, lang === 'en' ? 'Grammar' : 'Grammatik');
+
+    if (!words?.classList.contains('active')) return;
+
+    setText(document.getElementById('sectionTitle'), lang === 'en' ? 'Vocabulary' : 'Wortschatz');
+    setText(document.getElementById('sectionEyebrow'), lang === 'en' ? 'EPD · VOCABULARY' : 'EPD · WORTSCHATZ');
+
+    const hero = document.querySelector('.study-hero');
+    if (hero) {
+      setText(hero.querySelector('.eyebrow'), lang === 'en' ? 'YOUR VOCABULARY LISTS' : 'DEINE WORTLISTEN');
+      setText(hero.querySelector('h2'), lang === 'en' ? 'Learn vocabulary with flashcards' : 'Wortschatz wie mit Karteikarten lernen');
+      setText(hero.querySelector('p'), lang === 'en'
+        ? 'Create English ↔ Russian lists. German vocabulary stays in the German section.'
+        : 'Erstelle Listen, lerne mit Karten oder trainiere in 7er-Blöcken mit Auswahl- und Schreibaufgaben.');
+    }
+
+    setText(document.getElementById('newDeckBtn'), lang === 'en' ? '+ New vocabulary list' : '+ Neue Wortliste');
+  }
+
   let activeDeckId = null;
   let editingDeckId = null;
   let draftDeckLanguage = null;
 
   function patchDeckTiles() {
     const map = readDeckLanguages();
-    document.querySelectorAll('[data-open-deck]').forEach(tile => {
+    const lang = activeLanguage();
+    const grid = document.getElementById('deckGrid');
+    const tiles = [...document.querySelectorAll('[data-open-deck]')];
+    let visible = 0;
+
+    tiles.forEach(tile => {
       const id = tile.dataset.openDeck;
-      if (!id || tile.querySelector('.deck-lang-badge')) return;
-      const badge = document.createElement('span');
-      badge.className = 'deck-lang-badge';
-      badge.textContent = map[id] === 'en' ? 'English' : 'Deutsch';
-      const preview = tile.querySelector('.deck-preview');
-      if (preview) preview.insertAdjacentElement('beforebegin', badge);
-      else tile.appendChild(badge);
+      if (!id) return;
+      const tileLang = map[id] === 'en' ? 'en' : 'de';
+      const shouldShow = tileLang === lang;
+      tile.classList.toggle('epd14-lang-hidden', !shouldShow);
+      tile.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+      if (!shouldShow) return;
+
+      visible += 1;
+      let badge = tile.querySelector('.deck-lang-badge');
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'deck-lang-badge';
+        const preview = tile.querySelector('.deck-preview');
+        if (preview) preview.insertAdjacentElement('beforebegin', badge);
+        else tile.appendChild(badge);
+      }
+      badge.textContent = tileLang === 'en' ? 'English' : 'Deutsch';
     });
+
+    if (!grid || !tiles.length) return;
+    let empty = grid.querySelector('.language-filter-empty');
+    if (visible === 0) {
+      if (!empty) {
+        empty = document.createElement('div');
+        empty.className = 'study-empty language-filter-empty';
+        grid.appendChild(empty);
+      }
+      empty.innerHTML = lang === 'en'
+        ? '<div class="study-empty-icon">🗂️</div><h3>No English vocabulary lists yet</h3><p>Create an English ↔ Russian list here. German lists stay only in the German section.</p>'
+        : '<div class="study-empty-icon">🗂️</div><h3>Noch keine deutschen Wortlisten</h3><p>Erstelle hier eine Deutsch ↔ Russisch Wortliste.</p>';
+    } else if (empty) {
+      empty.remove();
+    }
   }
 
   function patchTermEditor(lang) {
@@ -414,6 +472,7 @@
   function patchAll() {
     addLanguageSwitch();
     patchCoreLanguageUI();
+    patchCustomLanguageUI();
     patchDeckTiles();
     patchDeckEditor();
     patchStudyModeLanguage();

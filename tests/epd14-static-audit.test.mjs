@@ -11,8 +11,9 @@ const epd = read('epd14.js');
 const language = read('epd14-language.js');
 const grammar = read('epd14-grammar-followup.js');
 const fixes = read('epd14-audit-fixes.js');
+const seed = read('epd14-wortschatz-seed.js');
 
-const allSource = [index, app, epd, language, grammar, fixes].join('\n');
+const allSource = [index, app, epd, language, grammar, fixes, seed].join('\n');
 
 test('EPD scripts load in dependency-safe order', () => {
   const order = [
@@ -88,4 +89,26 @@ test('EPD source has no MOST/Supabase/portal integration', () => {
   assert.doesNotMatch(allSource, /most-austria/i);
   assert.doesNotMatch(allSource, /supabase/i);
   assert.doesNotMatch(allSource, /portal_(clients|crm|stage)|\/api\/portal/i);
+});
+
+
+test('German and English Wortschatz decks are isolated in the UI', () => {
+  assert.match(language, /tileLang === lang/);
+  assert.match(language, /epd14-lang-hidden/);
+  assert.match(language, /No English vocabulary lists yet/);
+  assert.match(language, /German lists stay only in the German section/);
+  assert.match(language, /Vocabulary/);
+});
+
+test('Bedtime Procrastination decks are additive and do not replace existing decks', () => {
+  for (const title of [
+    'Bedtime Procrastination — Substantive',
+    'Bedtime Procrastination — Verben',
+    'Bedtime Procrastination — Adjektive & Konnektoren',
+    'Bedtime Procrastination — Sätze & Strukturen',
+  ]) assert.ok(seed.includes(title));
+  assert.match(seed, /hadExistingWortschatz/);
+  assert.ok(seed.includes("new Set(['seed-deck-13', 'seed-deck-14', 'seed-deck-15', 'seed-deck-16'])"));
+  assert.match(seed, /data\.decks = currentDecks/);
+  assert.doesNotMatch(seed, /data\.decks = decks;/);
 });
