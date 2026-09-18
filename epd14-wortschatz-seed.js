@@ -1,6 +1,6 @@
 (() => {
   const STORAGE_KEY = 'epd-heft-epd14-v1';
-  const SEED_VERSION = 'wortschatz-2026-09-17-v2';
+  const SEED_VERSION = 'wortschatz-2026-09-18-v3';
 
   const now = Date.now();
   const card = (de, ru, index) => ({
@@ -157,6 +157,67 @@
         ['Meiner Auffassung nach überwiegen die Vorteile/Nachteile.', 'По моему мнению, преимущества/недостатки перевешивают.'],
       ],
     },
+
+    {
+      title: 'Bedtime Procrastination — Substantive',
+      cards: [
+        ['das Hinauszögern', 'откладывание / затягивание'],
+        ['der Schlafmangel', 'недостаток сна'],
+        ['die Selbstkontrolle', 'самоконтроль'],
+        ['die Selbstregulation', 'саморегуляция'],
+        ['der Chronotyp', 'хронотип'],
+        ['die Leistungsfähigkeit', 'работоспособность / продуктивность'],
+        ['die Verbreitung', 'распространение'],
+        ['die Untersuchung', 'исследование'],
+        ['die Annahme', 'предположение / допущение'],
+        ['der Zusammenhang', 'взаимосвязь / связь'],
+      ],
+    },
+    {
+      title: 'Bedtime Procrastination — Verben',
+      cards: [
+        ['hinauszögern', 'откладывать / затягивать'],
+        ['aufschieben', 'откладывать'],
+        ['zu etwas beitragen', 'способствовать чему-либо'],
+        ['vorkommen', 'встречаться / иметь место'],
+        ['auf etwas hindeuten', 'указывать на что-либо'],
+        ['etwas als problematisch bewerten', 'оценивать что-либо как проблематичное'],
+        ['etwas begünstigen', 'способствовать чему-либо / создавать благоприятные условия'],
+        ['zu etwas neigen', 'быть склонным к чему-либо'],
+        ['etwas infrage stellen', 'ставить что-либо под сомнение'],
+        ['etwas beeinträchtigen', 'негативно влиять на что-либо / ухудшать'],
+      ],
+    },
+    {
+      title: 'Bedtime Procrastination — Adjektive & Konnektoren',
+      cards: [
+        ['triftig', 'веский / убедительный'],
+        ['eindeutig', 'однозначный / ясный'],
+        ['repräsentativ', 'репрезентативный'],
+        ['weit verbreitet', 'широко распространённый'],
+        ['mangelnd', 'недостаточный / отсутствующий'],
+        ['kurzfristig', 'краткосрочный / в краткосрочной перспективе'],
+        ['langfristig', 'долгосрочный / в долгосрочной перспективе'],
+        ['offenbar', 'по-видимому / очевидно'],
+        ['insbesondere', 'в особенности / особенно'],
+        ['ausschließlich', 'исключительно / только'],
+        ['dennoch', 'тем не менее / всё же'],
+        ['bislang', 'до сих пор / пока что'],
+      ],
+    },
+    {
+      title: 'Bedtime Procrastination — Sätze & Strukturen',
+      cards: [
+        ['Personen, denen es schwerfällt, ihr Verhalten zu regulieren, neigen offenbar stärker dazu, das Schlafengehen aufzuschieben.', 'Люди, которым трудно контролировать своё поведение, по-видимому, более склонны откладывать отход ко сну.'],
+        ['Wie häufig Bedtime Procrastination tatsächlich vorkommt, lässt sich bislang nicht eindeutig sagen.', 'Пока нельзя однозначно сказать, насколько часто в действительности встречается откладывание отхода ко сну.'],
+        ['Fachleute vermuten, dass insbesondere elektronische Geräte erheblich zur Verbreitung dieses Phänomens beigetragen haben.', 'Специалисты предполагают, что особенно электронные устройства в значительной степени способствовали распространению этого явления.'],
+        ['Diese Erkenntnis stellt die Annahme infrage, Bedtime Procrastination sei ausschließlich eine Folge mangelnder Selbstdisziplin.', 'Этот вывод ставит под сомнение предположение, что откладывание отхода ко сну является исключительно следствием недостатка самодисциплины.'],
+        ['Problematisch wird das Verhalten vor allem dann, wenn es dauerhaft zu Schlafmangel führt.', 'Такое поведение становится проблематичным прежде всего тогда, когда оно постоянно приводит к недостатку сна.'],
+        ['Da sie abends später müde werden, fällt es ihnen schwer, früh einzuschlafen.', 'Поскольку вечером они устают позже, им трудно рано заснуть.'],
+        ['Müssen sie dennoch morgens früh aufstehen, geraten ihr natürlicher Rhythmus und gesellschaftliche Zeitpläne miteinander in Konflikt.', 'Если им всё же приходится рано вставать утром, их естественный ритм вступает в конфликт с общественным распорядком дня.'],
+        ['Einige Forschende sehen einen Zusammenhang mit mangelnder Selbstkontrolle.', 'Некоторые исследователи видят связь с недостаточным самоконтролем.'],
+      ],
+    },
   ];
 
   const decks = rawDecks.map((deck, deckIndex) => ({
@@ -177,9 +238,24 @@
 
   if (data.wortschatzSeedVersion === SEED_VERSION) return;
 
-  data.words = [];
-  data.decks = decks;
-  data.migratedWordsAt = now;
+  const currentDecks = Array.isArray(data.decks) ? data.decks : [];
+  const existingIds = new Set(currentDecks.map(deck => deck?.id).filter(Boolean));
+  const previousSeedVersion = data.wortschatzSeedVersion;
+  const newDeckIds = new Set(['seed-deck-13', 'seed-deck-14', 'seed-deck-15', 'seed-deck-16']);
+  const decksToAdd = previousSeedVersion === 'wortschatz-2026-09-17-v2'
+    ? decks.filter(deck => newDeckIds.has(deck.id))
+    : decks;
+
+  decksToAdd.forEach(deck => {
+    if (!existingIds.has(deck.id)) {
+      currentDecks.push(deck);
+      existingIds.add(deck.id);
+    }
+  });
+
+  data.words = Array.isArray(data.words) ? data.words : [];
+  data.decks = currentDecks;
+  if (!data.migratedWordsAt) data.migratedWordsAt = now;
   data.wortschatzSeedVersion = SEED_VERSION;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 })();
